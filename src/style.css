@@ -1,0 +1,23 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+#info {
+  box-sizing: border-box;
+  padding: 20px;
+  height: 225px;
+  width: 350px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 14px;
+  line-height: 30px;
+  overflow: auto;
+  overflow-wrap: break-word;
+}
+
+#info span {
+  font-weight: 600;
+  color: #f7be81;
+}
