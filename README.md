@@ -8,6 +8,11 @@ A web application that demonstrates reactive state management using ArcGIS JavaS
 * **State Management:** Automatic UI updates based on component changes
 * **Component Monitoring:** Tracks map readiness, zoom, scale, stationary status, and basemap changes
 
+## Screenshot
+
+1. The main application
+   <img width="959" alt="image" src="https://github.com/user-attachments/assets/79cc173d-6137-4445-a2ca-295f7c856eb2" />
+
 ## Prerequisites
 
 * Node.js
