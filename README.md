@@ -182,6 +182,8 @@ reactiveUtils.watch(
 npm run dev
 ```
 
+The application can then be run on `https://localhost:5173`
+
 2. For production, run:
 ```bash
 npm run build
