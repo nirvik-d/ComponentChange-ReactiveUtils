@@ -20,25 +20,23 @@ A web application that demonstrates reactive state management using ArcGIS JavaS
 
 ## Project Setup
 
-1. **Initialize Project**
+### Initialize Project
 
-    ```bash
-    npm create vite@latest
-    ```
+```bash
+npm create vite@latest
+```
 
-    Follow the instructions on screen to initialize the project.
+Follow the instructions on screen to initialize the project.
 
-2. **Install Dependencies**
+### Install Dependencies
 
-    ```bash
-    npm install
-    ```
+```bash
+npm install @arcgis/map-components
+```
 
 ## Code Structure
 
 ### HTML Structure
-
-The HTML file sets up the basic structure for the ArcGIS web application:
 
 ```html
 <html lang="en">
@@ -46,19 +44,6 @@ The HTML file sets up the basic structure for the ArcGIS web application:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Monitor component change using reactiveUtils</title>
-  
-  <!-- Load the styles -->
-  <link rel="stylesheet" href="./src/style.css">
-
-  <!-- Load Calcite components from CDN -->
-  <script type="module" src="https://js.arcgis.com/calcite-components/3.2.1/calcite.esm.js"></script>
-
-  <!-- Load the ArcGIS Maps SDK for JavaScript from CDN -->
-  <link rel="stylesheet" href="https://js.arcgis.com/4.33/esri/themes/dark/main.css">
-  <script src="https://js.arcgis.com/4.33/"></script>
-
-  <!-- Load Map components from CDN-->
-  <script type="module" src="https://js.arcgis.com/4.33/map-components/"></script>
 </head>
 <body class="calcite-theme-dark">
   <arcgis-map id="map" item-id="ceb8954a5f2c457284c5074efd5a5ca0">
@@ -76,12 +61,15 @@ The HTML file sets up the basic structure for the ArcGIS web application:
   <script type="module" src="./src/main.js"></script>
 </body>
 </html>
-
 ```
 
 ### CSS Structure
 
 ```css
+@import "https://js.arcgis.com/calcite-components/3.2.1/calcite.css";
+@import "https://js.arcgis.com/4.33/esri/themes/light/main.css";
+@import "https://js.arcgis.com/4.33/map-components/main.css";
+
 html,
 body {
   margin: 0;
@@ -106,30 +94,43 @@ body {
   color: #f7be81;
 }
 
+
 ```
 
-### JavaScript Structure
+### TypeScript Structure
 
-The main JavaScript file demonstrates comprehensive reactive state management:
+```typescript
+import "./style.css";
 
-```javascript
-// Import ArcGIS reactive utilities for handling component state changes
-const reactiveUtils = await $arcgis.import("@arcgis/core/core/reactiveUtils");
+import "@arcgis/map-components/components/arcgis-map";
+import "@arcgis/map-components/components/arcgis-zoom";
+import "@arcgis/map-components/components/arcgis-expand";
+import "@arcgis/map-components/components/arcgis-basemap-gallery";
+import "@arcgis/map-components/components/arcgis-placement";
+
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils";
 
 // DOM elements
-const mapElement = document.getElementById("map");
-const logElement = document.getElementById("messages");
+const map: HTMLArcgisMapElement | null = document.querySelector("arcgis-map");
+if(!map){
+  throw new Error("Map element not found");
+}
+
+const logElement: HTMLDivElement | null = document.querySelector("#messages");
+if(!logElement){
+  throw new Error("Log element not found");
+}
 
 // Wait for the map component to be ready
-await mapElement.viewOnReady();
+await map.viewOnReady();
 
 // State object to track map properties
 const state = {
   ready: false,      // Map component readiness status
-  zoom: null,        // Current zoom level
-  scale: null,       // Current scale
-  stationary: null,  // Whether map is stationary
-  basemap: null,     // Current basemap title
+  zoom: 0,        // Current zoom level
+  scale: 0,       // Current scale
+  stationary: false,  // Whether map is stationary
+  basemap: "",     // Current basemap title
 };
 
 // Function to update and render the state in the UI
@@ -144,34 +145,34 @@ const renderState = () => {
 
 // Watch for changes in map component readiness
 reactiveUtils.watch(
-  () => mapElement.ready,
+  () => map.ready,
   (isComponentReady) => {
     state.ready = isComponentReady;
     renderState();
   },
-  {initialValue: true}
 );
 
 // Watch for changes in zoom, scale, and stationary status
 reactiveUtils.watch(
-  () => [mapElement.zoom, mapElement.scale, mapElement.stationary],
+  () => [map.zoom, map.scale, map.stationary],
   ([zoomLevel, scaleValue, isStationary]) => {
-    state.zoom = zoomLevel;
-    state.scale = scaleValue;
-    state.stationary = isStationary;
+    state.zoom = zoomLevel as number;
+    state.scale = scaleValue as number;
+    state.stationary = isStationary as boolean;
     renderState();
-  },
-  {initialValue: true}
+  }
 );
 
 // Watch for changes in basemap
 reactiveUtils.watch(
-  () => mapElement.basemap?.title,
-  (baseMapTitle) =>{
-    state.basemap = baseMapTitle;
-    renderState();
+  () => {
+    const basemap = map.basemap;
+    return typeof basemap === 'string' ? basemap : basemap?.title;
   },
-  {initialValue: true}
+  (baseMapTitle) => {
+    state.basemap = baseMapTitle || 'Unknown';
+    renderState();
+  }
 );
 ```
 
